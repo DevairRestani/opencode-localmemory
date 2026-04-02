@@ -1,0 +1,32 @@
+{
+  "name": "opencode-localmemory",
+  "version": "1.0.0",
+  "description": "Plugin de memória persistente local para OpenCode — sem serviço externo",
+  "type": "module",
+  "main": "./dist/index.js",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "bun build index.ts --outdir dist --format esm --target bun",
+    "install-plugin": "bun run scripts/install.ts",
+    "typecheck": "tsc --noEmit",
+    "dev": "bun run build --watch"
+  },
+  "dependencies": {
+    "@opencode-ai/plugin": "latest"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.11",
+    "@types/node": "^25.5.0",
+    "typescript": "latest"
+  },
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "memory",
+    "persistent",
+    "local"
+  ],
+  "license": "MIT"
+}
