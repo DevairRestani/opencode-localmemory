@@ -33,11 +33,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/DevairRestani/memmoryit.git"
+    "url": "git+https://github.com/DevairRestani/opencode-localmemory.git"
   },
-  "homepage": "https://github.com/DevairRestani/memmoryit#readme",
+  "homepage": "https://github.com/DevairRestani/opencode-localmemory#readme",
   "bugs": {
-    "url": "https://github.com/DevairRestani/memmoryit/issues"
+    "url": "https://github.com/DevairRestani/opencode-localmemory/issues"
   },
   "dependencies": {
     "@opencode-ai/plugin": "latest"

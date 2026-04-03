@@ -23,8 +23,8 @@ OpenCode will install it automatically at startup via Bun.
 ### From source
 
 ```bash
-git clone https://github.com/DevairRestani/memmoryit.git
-cd memmoryit
+git clone https://github.com/DevairRestani/opencode-localmemory.git
+cd opencode-localmemory
 bun install
 bun run build
 bun run install-plugin
@@ -34,7 +34,7 @@ Or manually add to `~/.config/opencode/opencode.jsonc`:
 
 ```jsonc
 {
-  "plugin": ["file:///absolute/path/to/memmoryit"]
+  "plugin": ["file:///absolute/path/to/opencode-localmemory"]
 }
 ```
 
