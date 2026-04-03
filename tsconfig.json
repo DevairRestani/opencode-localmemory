@@ -12,6 +12,6 @@
     "declarationMap": true,
     "sourceMap": true
   },
-  "include": ["index.ts", "install.ts"],
+  "include": ["index.ts", "install.ts", "src/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }

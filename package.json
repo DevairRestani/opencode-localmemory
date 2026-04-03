@@ -1,7 +1,7 @@
 {
   "name": "opencode-localmemory",
-  "version": "1.0.0",
-  "description": "Plugin de memória persistente local para OpenCode — sem serviço externo",
+  "version": "2.0.0",
+  "description": "Plugin de memória persistente local para OpenCode — Markdown files com frontmatter",
   "type": "module",
   "main": "./dist/index.js",
   "exports": {
@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "bun build index.ts --outdir dist --format esm --target bun",
-    "install-plugin": "bun run scripts/install.ts",
+    "install-plugin": "bun run install.ts",
     "typecheck": "tsc --noEmit",
     "dev": "bun run build --watch"
   },
@@ -26,7 +26,9 @@
     "opencode-plugin",
     "memory",
     "persistent",
-    "local"
+    "local",
+    "markdown",
+    "frontmatter"
   ],
   "license": "MIT"
 }
