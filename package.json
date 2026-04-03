@@ -1,25 +1,24 @@
 {
   "name": "opencode-localmemory",
   "version": "2.0.0",
-  "description": "Plugin de memória persistente local para OpenCode — Markdown files com frontmatter",
+  "description": "Persistent local memory plugin for OpenCode — Markdown files with YAML frontmatter, zero cost, fully offline",
   "type": "module",
   "main": "./dist/index.js",
   "exports": {
     ".": "./dist/index.js"
   },
+  "files": [
+    "dist/",
+    "LICENSE",
+    "README.md"
+  ],
   "scripts": {
     "build": "bun build index.ts --outdir dist --format esm --target bun",
     "install-plugin": "bun run install.ts",
     "typecheck": "tsc --noEmit",
-    "dev": "bun run build --watch"
-  },
-  "dependencies": {
-    "@opencode-ai/plugin": "latest"
-  },
-  "devDependencies": {
-    "@types/bun": "^1.3.11",
-    "@types/node": "^25.5.0",
-    "typescript": "latest"
+    "dev": "bun run build --watch",
+    "test": "bun test",
+    "prepublishOnly": "bun run build"
   },
   "keywords": [
     "opencode",
@@ -28,7 +27,24 @@
     "persistent",
     "local",
     "markdown",
-    "frontmatter"
+    "frontmatter",
+    "offline"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DevairRestani/memmoryit.git"
+  },
+  "homepage": "https://github.com/DevairRestani/memmoryit#readme",
+  "bugs": {
+    "url": "https://github.com/DevairRestani/memmoryit/issues"
+  },
+  "dependencies": {
+    "@opencode-ai/plugin": "latest"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.11",
+    "@types/node": "^25.5.0",
+    "typescript": "latest"
+  }
 }

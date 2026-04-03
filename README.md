@@ -1,148 +1,181 @@
 # opencode-localmemory
 
-Plugin de memória persistente **local** para [OpenCode](https://opencode.ai) — sem assinatura, sem serviço externo, zero custo adicional.
+Persistent **local** memory plugin for [OpenCode](https://opencode.ai) — no subscription, no external service, zero cost.
 
-Inspirado no [opencode-supermemory](https://github.com/supermemoryai/opencode-supermemory), mas com armazenamento 100% local usando arquivos JSON em `~/.config/opencode/localmemory/`.
+Stores memories as **Markdown files with YAML frontmatter** organized per-project under `~/.config/opencode/localmemory/`. Inspired by [Claude Code's memory system](https://docs.anthropic.com/en/docs/claude-code/memory), but 100% local and offline.
 
 ---
 
-## Instalação
+## Installation
 
-### 1. Clone ou baixe
+### From npm (recommended)
 
-```bash
-git clone https://github.com/seu-usuario/opencode-localmemory
-cd opencode-localmemory
-```
-
-### 2. Instale dependências e compile
-
-```bash
-bun install
-bun run build
-```
-
-### 3. Registre o plugin
-
-```bash
-bun run install-plugin
-```
-
-Ou manualmente, adicione ao `~/.config/opencode/opencode.jsonc`:
+Add to your `opencode.json` or `~/.config/opencode/opencode.jsonc`:
 
 ```jsonc
 {
-  "plugin": ["file:///caminho/absoluto/para/opencode-localmemory"]
+  "plugin": ["opencode-localmemory"]
 }
 ```
 
-### 4. Reinicie o OpenCode
+OpenCode will install it automatically at startup via Bun.
 
-O plugin `memory` aparecerá na lista de ferramentas disponíveis.
+### From source
+
+```bash
+git clone https://github.com/DevairRestani/memmoryit.git
+cd memmoryit
+bun install
+bun run build
+bun run install-plugin
+```
+
+Or manually add to `~/.config/opencode/opencode.jsonc`:
+
+```jsonc
+{
+  "plugin": ["file:///absolute/path/to/memmoryit"]
+}
+```
+
+Restart OpenCode and the `memory` tool will appear in the available tools list.
 
 ---
 
-## Como funciona
+## How it works
 
-### Ferramenta `memory`
+### The `memory` tool
 
-O agente tem acesso direto à ferramenta `memory` com quatro modos:
+The agent gets direct access to a `memory` tool with 7 modes:
 
-| Modo     | Argumentos            | Descrição                              |
-|----------|-----------------------|----------------------------------------|
-| `add`    | `content`, `scope?`, `type?`, `tags?` | Salva uma memória nova |
-| `search` | `query`               | Busca memórias por palavras-chave      |
-| `list`   | `scope?`              | Lista todas as memórias de um escopo   |
-| `forget` | `id`, `scope?`        | Remove uma memória pelo ID             |
+| Mode | Arguments | Description |
+|------|-----------|-------------|
+| `save` | `name`, `content`, `scope?`, `type?`, `tags?` | Create or update a memory |
+| `search` | `query` | Search memories by keywords |
+| `list` | `scope?` | List all memories in a scope |
+| `forget` | `name` | Remove a memory by name |
+| `recall` | `query` | Get top relevant memories with freshness warnings |
+| `extract` | — | Get instructions for extracting memories from conversation |
+| `consolidate` | — | Get instructions for reviewing, merging, and pruning memories |
 
-### Escopos
+### Scopes
 
-| Escopo    | Arquivo                              | Persiste em          |
-|-----------|--------------------------------------|----------------------|
-| `user`    | `localmemory/user_<hash>.json`       | Todos os projetos    |
-| `project` | `localmemory/project_<hash>.json`    | Este diretório       |
+| Scope | Storage | Availability |
+|-------|---------|-------------|
+| `user` | `~/.config/opencode/localmemory/user/memory/` | Cross-project, always available |
+| `project` | `~/.config/opencode/localmemory/projects/<hash>/memory/` | Isolated per git repository |
 
-O hash é derivado do usuário do SO (`user`) ou do caminho absoluto do projeto (`project`).
+The project hash is derived from `git rev-parse --show-toplevel`.
 
-### Tipos de memória
+### Memory types (4 types)
 
-`preference` · `project-config` · `architecture` · `error-solution` · `learned-pattern` · `conversation` · `general`
+| Type | What it stores | Example |
+|------|---------------|---------|
+| `user` | Role, goals, preferences, knowledge level | "User is a senior backend engineer" |
+| `feedback` | Corrections about how to work with this user | "Always run tests after changes" |
+| `project` | Work context not derivable from code | "Deploy deadline is April 15" |
+| `reference` | Pointers to external systems | "Monitoring: https://grafana.example.com/d/abc" |
 
-### Busca local
+### File format
 
-A busca usa **sobreposição de tokens** (sem embeddings, sem API externa). Funciona bem para recuperar memórias por palavras-chave relevantes.
+Each memory is a `.md` file with YAML frontmatter:
 
-### Compactação de contexto
+```markdown
+---
+name: User Role
+description: Senior backend engineer focused on observability
+type: user
+created: 2026-04-02T10:00:00Z
+updated: 2026-04-02T10:00:00Z
+tags: [observability, python]
+---
 
-Quando a janela de contexto atinge o limite, o hook `experimental.session.compacting` injeta automaticamente todas as memórias no prompt de continuação, garantindo que nada seja perdido entre compactações.
+Content of the memory goes here.
+```
+
+### MEMORY.md index
+
+A `MEMORY.md` index file is automatically maintained in each scope directory and loaded into the system prompt so the agent always knows what memories exist. Limits: 200 lines, 25KB, ~150 chars per entry.
+
+### Context compaction
+
+When the context window fills up, the `experimental.session.compacting` hook injects all memories into the continuation prompt so nothing is lost across compactions.
+
+### Search
+
+Keyword-based **token overlap** with recency scoring — no embeddings, no external API. Works fully offline.
 
 ---
 
-## Uso
+## Usage
 
-### Frases que ativam o salvamento automático
+### Phrases that trigger automatic saving
 
-O agente reconhece frases como:
+The agent recognizes phrases like:
 
-- *"lembre que prefiro respostas concisas"*
-- *"salva que este projeto usa Bun, não Node"*
-- *"remember to always use TypeScript strict mode here"*
-- *"não esqueça: o deploy é via GitHub Actions"*
+- *"remember that I prefer concise responses"*
+- *"save that this project uses Bun, not Node"*
+- *"don't forget: deploy is via GitHub Actions"*
+- *"lembra que prefiro respostas concisas"*
+- *"salva isso"*
+- *"não esqueça"*
 
-### Direto pela ferramenta
-
-```
-Adicione à memória do projeto: este projeto usa Vue 3 com Composition API.
-```
+### Direct tool usage
 
 ```
-Busque na memória o que você sabe sobre o deploy deste projeto.
+Save to project memory: this project uses Vue 3 with Composition API.
+```
+
+```
+Search memory for what you know about this project's deployment.
 ```
 
 ---
 
-## Arquivos gerados
+## Storage layout
 
 ```
 ~/.config/opencode/localmemory/
-  user_<sha256>.json        ← memórias cross-project
-  project_<sha256>.json     ← memórias deste projeto
+├── user/
+│   └── memory/
+│       ├── MEMORY.md           # Index file (always in system prompt)
+│       ├── user_role.md        # Memory files with frontmatter
+│       └── ...
+└── projects/
+    └── <sha256-hash>/
+        └── memory/
+            ├── MEMORY.md
+            ├── project_context.md
+            └── ...
 ```
 
-Formato:
-
-```json
-{
-  "version": 1,
-  "memories": [
-    {
-      "id": "a1b2c3d4",
-      "content": "Prefere respostas concisas em português",
-      "type": "preference",
-      "scope": "user",
-      "createdAt": "2026-04-02T10:00:00.000Z",
-      "updatedAt": "2026-04-02T10:00:00.000Z",
-      "tags": []
-    }
-  ]
-}
-```
+Legacy `.json` files from v1 are **auto-migrated** to `.md` on first load (originals backed up as `.json.bak`).
 
 ---
 
-## Diferenças do opencode-supermemory
+## Comparison with opencode-supermemory
 
-| Feature               | opencode-supermemory       | opencode-localmemory     |
-|-----------------------|----------------------------|--------------------------|
-| Armazenamento         | Nuvem (Supermemory API)    | Local (`~/.config/...`)  |
-| Busca semântica       | Embeddings vetoriais       | Keyword overlap          |
-| Custo                 | Assinatura paga            | Zero                     |
-| Privacidade           | Dados enviados para API    | 100% local               |
-| Sync entre máquinas   | Sim (via API)              | Não (mas portável via git)|
-| Funciona offline      | Não                        | Sim                      |
+| Feature | opencode-supermemory | opencode-localmemory |
+|---------|---------------------|---------------------|
+| Storage | Cloud (Supermemory API) | Local (`~/.config/...`) |
+| Semantic search | Vector embeddings | Keyword overlap |
+| Cost | Paid subscription | Zero |
+| Privacy | Data sent to API | 100% local |
+| Cross-machine sync | Yes (via API) | No (portable via files) |
+| Works offline | No | Yes |
 
 ---
 
-## Licença
+## Development
+
+```bash
+bun install
+bun run build        # Compile to dist/
+bun run typecheck    # Type-check only
+bun run dev          # Watch mode
+bun test             # Run tests
+```
+
+## License
 
 MIT
