@@ -4,6 +4,25 @@ Persistent **local** memory plugin for [OpenCode](https://opencode.ai) — no su
 
 Stores memories as **Markdown files with YAML frontmatter** organized per-project under `~/.config/opencode/localmemory/`. Inspired by [Claude Code's memory system](https://docs.anthropic.com/en/docs/claude-code/memory), but 100% local and offline.
 
+## Por que usar
+
+- Os dados permanecem no computador: não há API, conta ou custo recorrente.
+- Memórias de usuário podem ser reutilizadas entre projetos, enquanto as de projeto ficam isoladas por repositório Git.
+- Os arquivos são Markdown legível e versionável; não há formato proprietário.
+- A busca combina palavras-chave e recência, sem embeddings nem serviço externo.
+
+## Início rápido
+
+Adicione o plugin ao arquivo de configuração do OpenCode:
+
+```jsonc
+{
+  "plugin": ["opencode-localmemory"]
+}
+```
+
+Depois de reiniciar o OpenCode, peça ao agente algo como: `salva que este projeto usa Bun, não Node`.
+
 ---
 
 ## Installation
